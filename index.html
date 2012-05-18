@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>mussstache</title>
+    <script src='./mustache.js'></script>
+    <link href="http://d297h9he240fqh.cloudfront.net/cache-1e795b96d/assets/compass.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="http://d297h9he240fqh.cloudfront.net/cache-1e795b96d/assets/views_two.css" media="screen" rel="stylesheet" type="text/css" />
+    <style>
+      #target { width: 220px }
+    </style>
+
+  </head>
+  <body>
+    <textarea id='data'>
+    </textarea>
+    <div id='target'></div>
+    <script type='text/html' id='project_baseball_card_tall'>
+      <div class="project-card-wrap">
+        <div class="project-card project-live">
+          <div class="project-thumbnail">
+            <a href="{{urls.web.project}}" target=""><img alt="Photo-little" class="projectphoto-little" height="150" src="{{photo.little}}" width="200"></a>
+          </div>
+          <h2>
+            <strong>
+              <a href="{{urls.web.project}}" target="">{{name}}</a>
+            </strong>
+            <span>
+              by
+              {{creator.name}}
+            </span>
+          </h2>
+          <p>{{blurb}}</p>
+          <ul class="project-meta">
+            <li>
+            <a href="{{location.urls.web.discover}}" target=""><span class="icon-location"></span><span class="location-name">{{location.name}}</span></a>
+            </li>
+          </ul>
+          <div class="project-pledged-wrap">
+            <div class="project-pledged" style="width: {{percent_raised}}%"></div>
+          </div>
+          <ul class="project-stats">
+            <li class="first funded">
+            <strong>{{percent_raised_rounded}}%</strong>
+            funded
+            </li>
+            <li class="pledged">
+            <strong>${{formatted_money}}</strong>
+            pledged
+            </li>
+            </li>
+            <li class="last ksr_page_timer" data-end_time="2012-06-18T06:59:00Z">
+            <strong>
+              <div class="num">30</div>
+            </strong>
+            <div class="span text" data-word="left">days to go</div>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </script>
+    <script>
+      function format_money(n, decimals, decimal_sep, thousands_sep) { 
+        // if decimal is zero we must take it, it means user does not want to show any decimal
+        var c = isNaN(decimals) ? 2 : Math.abs(decimals), 
+          // if no decimal separator is passed we use the comma as default decimal separator (we MUST use a decimal separator)
+          d = decimal_sep || '.',
+
+          /*
+          according to
+          [http://stackoverflow.com/questions/411352/how-best-to-determine-if-an-argument-is-not-sent-to-the-javascript-function]
+          the fastest way to check for not defined parameter is to use
+          `typeof value === 'undefined'` rather than doing value === undefined.
+          */
+
+          //if you don't want ot use a thousands separator you can pass empty string as thousands_sep value
+          t = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep, 
+
+          sign = (n < 0) ? '-' : '',
+
+          //extracting the absolute value of the integer part of the number and converting to string
+          i = String(parseInt(n = Math.abs(n).toFixed(c), 10)), 
+
+          j;
+
+        j = ((j = i.length) > 3) ? j % 3 : 0; 
+
+        return sign + (j ? i.substr(0, j) + t : '') +
+          i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) +
+          (c ? d + Math.abs(n - i).toFixed(c).slice(2) : ''); 
+      }
+
+      function present_project(project) {
+        project.percent_raised = (project.pledged / project.goal) * 100;
+        project.percent_raised_rounded = Math.round(project.percent_raised);
+        project.formatted_money = format_money(project.pledged, 0);
+
+        return project;
+      }
+
+      function render() {
+        var data = present_project(JSON.parse(document.getElementById('data').value)),
+          template = document.getElementById('project_baseball_card_tall').innerHTML,
+          output = Mustache.render(template, data);
+        console.log(data);
+        document.getElementById('target').innerHTML = output;
+      }
+      render();
+      document.getElementById('data').addEventListener('input', render);
+    </script>
+  </body>
+</html>
