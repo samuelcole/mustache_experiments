@@ -20,7 +20,9 @@
       <div class="project-card-wrap">
         <div class="project-card project-live">
           <div class="project-thumbnail">
-            <a href="{{urls.web.project}}" target=""><img alt="Photo-little" class="projectphoto-little" height="150" src="{{photo.little}}" width="200"></a>
+            <a href="{{urls.web.project}}" target="">
+              <img alt="Photo-little" class="projectphoto-little" height="150" src="{{photo.little}}" width="200">
+            </a>
           </div>
           <h2>
             <strong>
@@ -32,31 +34,32 @@
             </span>
           </h2>
           <p>{{blurb}}</p>
-          <ul class="project-meta">
-            <li>
-            <a href="{{location.urls.web.discover}}" target=""><span class="icon-location"></span><span class="location-name">{{location.name}}</span></a>
-            </li>
-          </ul>
-          <div class="project-pledged-wrap">
-            <div class="project-pledged" style="width: {{percent_raised}}%"></div>
-          </div>
-          <ul class="project-stats">
-            <li class="first funded">
-            <strong>{{percent_raised_rounded}}%</strong>
-            funded
-            </li>
-            <li class="pledged">
-            <strong>${{formatted_money}}</strong>
-            pledged
-            </li>
-            </li>
-            <li class="last ksr_page_timer" data-end_time="2012-06-18T06:59:00Z">
-            <strong>
-              <div class="num">30</div>
-            </strong>
-            <div class="span text" data-word="left">days to go</div>
-            </li>
-          </ul>
+          {{#live_or_successful?}}
+            <ul class="project-meta">
+              <li>
+              <a href="{{location.urls.web.discover}}" target=""><span class="icon-location"></span><span class="location-name">{{location.name}}</span></a>
+              </li>
+            </ul>
+            <div class="project-pledged-wrap">
+              <div class="project-pledged" style="width: {{percent_raised}}%"></div>
+            </div>
+            <ul class="project-stats">
+              <li class="first funded">
+                <strong>{{percent_raised_rounded}}%</strong> funded
+              </li>
+              <li class="pledged">
+                <strong>${{formatted_money}}</strong> pledged
+              </li>
+              {{#live?}}
+                <li class="last ksr_page_timer" data-end_time="2012-06-18T06:59:00Z">
+                  <strong>
+                    <div class="num">30</div>
+                  </strong>
+                  <div class="span text" data-word="left">days to go</div>
+                </li>
+              {{/live?}}
+            </ul>
+          {{/live_or_successful?}}
 
         </div>
       </div>
@@ -93,9 +96,16 @@
       }
 
       function present_project(project) {
+        var states = ['live', 'successful', 'canceled', 'failed']
         project.percent_raised = (project.pledged / project.goal) * 100;
         project.percent_raised_rounded = Math.round(project.percent_raised);
         project.formatted_money = format_money(project.pledged, 0);
+
+        for (var i in states) {
+          var state = states[i];
+          project[state + '?'] = project.state === state;
+        }
+        project['live_or_successful?'] = project.state === 'live' || project.state === 'successful';
 
         return project;
       }
