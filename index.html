@@ -34,15 +34,35 @@
             </span>
           </h2>
           <p>{{blurb}}</p>
+          {{#failed?}}
+            <div class='project-status project-failed'>
+              <strong> Funding Unsuccessful</strong>
+              <span>Project ended on {{deadline}}</span>
+            </div>
+            {{/failed?}}
+          {{#canceled?}}
+            <div class='project-status project-canceled'>
+              <strong> Funding Canceled</strong>
+              <span>Project canceled on </span>
+            </div>
+          {{/canceled?}}
+          {{#successful?}}
+            <div class='project-pledged-successful'>
+              <strong>Successful!</strong>
+            </div>
+          {{/successful?}}
+
           {{#live_or_successful?}}
             <ul class="project-meta">
               <li>
               <a href="{{location.urls.web.discover}}" target=""><span class="icon-location"></span><span class="location-name">{{location.name}}</span></a>
               </li>
             </ul>
-            <div class="project-pledged-wrap">
-              <div class="project-pledged" style="width: {{percent_raised}}%"></div>
-            </div>
+            {{#live?}}
+              <div class="project-pledged-wrap">
+                <div class="project-pledged" style="width: {{percent_raised}}%"></div>
+              </div>
+            {{/live?}}
             <ul class="project-stats">
               <li class="first funded">
                 <strong>{{percent_raised_rounded}}%</strong> funded
@@ -50,6 +70,12 @@
               <li class="pledged">
                 <strong>${{formatted_money}}</strong> pledged
               </li>
+              {{#successful?}}
+                <li class="last successful">
+                  <strong>Funded</strong>
+                  <div class="deadline">{{deadline}}</div>
+                </li>
+              {{/successful?}}
               {{#live?}}
                 <li class="last ksr_page_timer" data-end_time="2012-06-18T06:59:00Z">
                   <strong>
